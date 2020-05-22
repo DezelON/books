@@ -1,0 +1,25 @@
+{% include "books/header.html" %}
+
+<div class="container w-50 mt-3">
+
+    <div class="justify-content-center" id="books">
+        <div v-for="book in books" v-bind:class="'ui-block-circle '+book.status" v-bind:id="'id_'+book.id" style="position: relative;">
+            <div class="input-group">
+                <input type="text" class="form-control h-auto" placeholder="Название" v-model="book.title" @change="updateBook(book, 'update')">
+                <textarea id="discription" class="form-control" style="min-height: 40px;" placeholder="Описание" v-model="book.description" @change="updateBook(book, 'update')"></textarea>
+                <input type="text" class="form-control h-auto" style="flex:none; width: 100px;" placeholder="Цена" v-model="book.price" @change="updateBook(book, 'update')">
+            </div>
+            <i v-bind:class="'far fa-times-circle delete-button '+(book.delete?'delete':'')" v-on:click="updateBook(book, 'delete')"></i>
+        </div>
+        <div class="ui-block-circle add-book mb-5" v-on:click="addBook()">
+            <i class="fas fa-plus-circle text-primary"></i>
+        </div>
+        <select v-model="author_id" class="custom-select mb-2" v-on:change="downloadBooks" required>
+            <option v-for="author in authors" v-bind:value="author.id">${fullName(author)}</option>
+        </select>
+        <button type="button" class="btn btn-success btn-block">Обновить базу книг автора</button>
+    </div>
+    <script src="/static/js/app.js"></script>
+</div>
+
+{% include "books/footer.html" %}

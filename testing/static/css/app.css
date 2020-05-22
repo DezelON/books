@@ -1,0 +1,70 @@
+.ui-block-circle {
+    width: 100%;
+    position: relative;
+    min-height: 46px;
+    border: 1px solid #dadada;
+    -webkit-border-radius: 3px;
+    border-radius: 20px;
+    padding: 10px 10px;
+    margin-top: 10px;
+    cursor: pointer;
+    -webkit-transition: background-color .3s ease-in-out;
+    -moz-transition: background-color .3s ease-in-out;
+    -o-transition: background-color .3s ease-in-out;
+    transition: background-color .3s ease-in-out;
+}
+
+.ui-block-circle.error{
+    background-color: #e22d2d41;
+}
+
+.ui-block-circle.warn{
+    background-color: #e2a32d41;
+}
+
+.ui-block-circle:first{
+    margin-top: 0px;
+}
+
+.add-book{
+    -webkit-transition: box-shadow .2s ease-in-out;
+    -moz-transition: box-shadow .2s ease-in-out;
+    -o-transition: box-shadow .2s ease-in-out;
+    transition: box-shadow .2s ease-in-out;
+}
+
+.add-book>i{
+    /* transform: rotate(45deg); */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 30px;
+}
+
+.add-book:hover{
+    box-shadow: 0 .7rem 2rem rgba(0,0,0,.175)!important;
+}
+
+.delete-button{
+    color: #00000033;
+    cursor: pointer;
+    font-size: 35px;
+    position: absolute;
+    right: -45px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: color .25s ease-in-out;
+}
+
+.delete-button.delete{
+    color: #eb0000aa
+}
+
+.delete-button:hover{
+    color: #eb0000aa
+}
+
+.delete-button.delete:hover{
+    color: #00000033;
+}
