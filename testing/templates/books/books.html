@@ -17,7 +17,7 @@
         <select v-model="author_id" class="custom-select mb-2" v-on:change="downloadBooks" required>
             <option v-for="author in authors" v-bind:value="author.id">${fullName(author)}</option>
         </select>
-        <button type="button" class="btn btn-success btn-block">Обновить базу книг автора</button>
+        <button type="button" class="btn btn-success btn-block" v-on:click="updateAll()">Обновить базу книг автора</button>
     </div>
     <script src="/static/js/app.js"></script>
 </div>

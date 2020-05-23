@@ -13,9 +13,6 @@ var books = new Vue({
         },
         created: false
     },
-    computed: {
-        
-    },
     methods: {
         fullName: function(author){
             full_name = author.surname + " " + author.name
@@ -23,6 +20,17 @@ var books = new Vue({
                 full_name += " " + author.patronymic
             }
             return full_name
+        },
+        getBookIndex: function(id){
+            let index = -1
+            let i = -1
+            this.books.forEach(book=>{
+                i++
+                if(book.id == id){
+                    index = i
+                }
+            })
+            return index
         },
         updateAll: function(){
             this.books.forEach(book =>{
@@ -40,14 +48,49 @@ var books = new Vue({
                 update: this.updates.update,
                 author_id: this.author_id
             })
-            .then(function (response) {
-                console.log(response)
-                //TODO
+            .then(response => {
+                data = response.data
+                console.log(data)
+                data.deleted.forEach(book_id=>{
+                    this.deleteBook(book_id)
+                })
+                data.updated.forEach(update_book=>{
+                    let i = this.getBookIndex(update_book.id)
+                    if(i!=-1){
+                        this.books[i].title = update_book.title
+                        this.books[i].description = update_book.description
+                        this.books[i].price = update_book.price
+
+                        this.books[i].status = update_book.status
+                        this.books[i].delete = update_book.delete
+                        this.books[i].new = update_book.new
+
+                        this.updateStyleBook(this.books[i].id, this.books[i].status)
+                    }
+                })
+                data.added.forEach(add_book=>{
+                    let i = this.getBookIndex(add_book.id)
+                    if(i!=-1){
+                        this.books[i].title = add_book.title
+                        this.books[i].description = add_book.description
+                        this.books[i].price = add_book.price
+
+                        this.books[i].status = add_book.status
+                        this.books[i].delete = add_book.delete
+                        this.books[i].new = add_book.new
+                        
+                        this.updateStyleBook(this.books[i].id, this.books[i].status)
+                    }
+                })
+                this.updates = {
+                    delete: [],
+                    add: [],
+                    update: []
+                }
             })
             .catch(function (error) {
                 console.log(error);
             });
-            this.downloadBooks()
         },
         downloadBooks: function(){
             author_id = this.author_id
@@ -55,14 +98,14 @@ var books = new Vue({
                 data: 'books',
                 author_id: author_id
             })
-            .then(function (response) {
-                books.$data.books = response.data
-                books.$data.books.forEach(book => {
+            .then(response => {
+                this.books = response.data
+                this.books.forEach(book => {
                     book.status = ""
                     book.delete = false
                     book.new = false
-                    if(book.id>books.$data.last_book_id){
-                        books.$data.last_book_id = book.id
+                    if(book.id>this.last_book_id){
+                        this.last_book_id = book.id
                     }
                 })
             })
@@ -89,26 +132,37 @@ var books = new Vue({
             }
             this.books.push(book)
         },
+        deleteBook: function(id){
+            let index = -1
+            let i = -1
+            this.books.forEach(b=>{
+                i++
+                if(b.id == id){
+                    index = i
+                }
+            })
+            if(index!=-1){
+                this.books.splice(index, 1)
+            }
+        },
+        updateStyleBook: function(id, style){//Костыль обработки функции измения класса из-за задержки в изменении
+            book_element = document.getElementById('id_'+id)
+            if(book_element.classList.contains('warn')){
+                book_element.classList.remove('warn')
+            }
+            if(book_element.classList.contains('error')){
+                book_element.classList.remove('error')
+            }
+            if(style!="")
+                book_element.classList.add(style) 
+        },
         updateBook: function(book, type){
             if(type=="update"){
-                book_element = document.getElementById('id_'+book.id)
-                if(!book_element.classList.contains('warn') && !book_element.classList.contains('error')){
-                    book_element.classList.add('warn') //Костыль обработки функции измения класса
-                }
+                this.updateStyleBook(book.id, 'warn')
                 book.status = 'warn'
             }else if(type=="delete"){
                 if(book.new){
-                    let index = 0
-                    let i = 0
-                    this.books.forEach(b=>{
-                        i++
-                        if(b.id == book.id){
-                            index = i
-                        }
-                    })
-                    if(index!=0){
-                        this.books.splice(index-1, 1)
-                    }
+                    this.deleteBook(book.id)
                 }else{
                     book_element = document.getElementById('id_'+book.id)
                     if(book.delete){
@@ -130,8 +184,8 @@ var books = new Vue({
         axios.post('/get', {
             data: 'authors'
         })
-        .then(function (response) {
-            books.$data.authors = response.data
+        .then(response => {
+            this.authors = response.data
         })
         .catch(function (error) {
             console.log(error);

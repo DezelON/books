@@ -44,19 +44,43 @@ def update(request):
         update = body.get('update')
         author_id = body.get('author_id')
         author = Author.get(id=author_id)
+        answer = {
+            'deleted': [],
+            'added': [],
+            'updated': []
+        }
         for delete_id in delete:
             book = Book.get(id=delete_id)
-            if book is not None: book.delete()
+            if book is not None:
+                book.delete()
+                answer['deleted'].append(delete_id)
         for book_update in update:
             book = Book.get(id=book_update['id'])
             if book is not None:
-                #TODO: Сделать проврку заполнения реквизитов и возврат обновлённых данных
-                book.title = book_update['title']
-                book.description = book_update['description']
-                book.price = book_update['price']
-                book.save()
+                title = book_update.get('title')
+                description = book_update.get('description')
+                price = book_update.get('price')
+                if title == "" or description == "" or price == "":
+                    book_update['status'] = 'error'
+                else:
+                    book.title = title
+                    book.description = description
+                    book.price = price
+                    book.save()
+                    book_update['status'] = ''
+                answer['updated'].append(book_update)
         for book_add in add:
-            pass
-            # Book.create(title=book_add['title']) #TODO
+            title = book_add.get('title')
+            description = book_add.get('description')
+            price = book_add.get('price')
+            if title == "" or description == "" or price == "":
+                book_add['status'] = 'error'
+            else:
+                book = Book.create(title, description, price, author)
+                book_add['status'] = ''
+                book_add['new'] = False
+                book_add['id'] = book.id
+            answer['added'].append(book_add)
+        return HttpResponse(json.dumps(answer))
     else:
         return HttpResponseRedirect('/')
